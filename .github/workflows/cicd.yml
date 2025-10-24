@@ -54,7 +54,7 @@ jobs:
     # Build Docker image (ensure Dockerfile copies JAR from 'docker/' folder)
     - name: Build Docker image
       run: |
-        docker build -t ${{ secrets.DOCKER_USERNAME }}/hello-maven:latest docker/
+        docker build -t ${{ secrets.DOCKER_USERNAME }}/hello-maven:latest .
 
     # Push Docker image to Docker Hub
     - name: Push Docker image
