@@ -4,9 +4,8 @@ FROM openjdk:17-jdk-slim
 # Set working directory
 WORKDIR /app
 
-# Copy the shaded JAR produced by Maven into the container
-# Use build argument JAR_FILE so GitHub Actions can specify the JAR dynamically
-ARG JAR_FILE=target/*-shaded.jar
+# Accept the JAR file path as a build argument
+ARG JAR_FILE
 COPY ${JAR_FILE} hello-maven.jar
 
 # Expose application port
