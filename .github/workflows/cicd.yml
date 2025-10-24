@@ -30,12 +30,12 @@ jobs:
       - name: Build with Maven
         run: mvn clean package --file pom.xml
 
-      # 4. Upload shaded JAR as artifact (optional)
+      # 4. Upload shaded JAR artifact (optional)
       - name: Upload shaded JAR artifact
         uses: actions/upload-artifact@v4
         with:
           name: hello-maven-shaded-jar
-          path: target/*-shaded.jar
+          path: target/hello-maven-shaded.jar
 
       # 5. Update dependency graph for Dependabot
       - name: Update dependency graph
@@ -51,8 +51,7 @@ jobs:
       # 7. Build Docker image using the shaded JAR
       - name: Build Docker image
         run: |
-          # Find the exact shaded JAR path
-          JAR_PATH=$(ls target/*-shaded.jar)
+          JAR_PATH=target/hello-maven-shaded.jar
           echo "Using JAR: $JAR_PATH"
           docker build --build-arg JAR_FILE=$JAR_PATH -t ${{ secrets.DOCKER_USERNAME }}/hello-maven:latest .
 
