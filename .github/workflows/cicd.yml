@@ -2,9 +2,11 @@ name: Java CI with Maven and Docker
 
 on:
   push:
-    branches: [ "main" ]
+    branches: 
+      - "main"
   pull_request:
-    branches: [ "main" ]
+    branches: 
+      - "main"
 
 permissions:
   contents: write
@@ -12,7 +14,7 @@ permissions:
 jobs:
   build:
 
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
 
     steps:
       # Checkout the repository
@@ -53,15 +55,7 @@ jobs:
         run: |
           docker build -t ${{ secrets.DOCKER_USERNAME }}/hello-maven:latest .
 
-      # **New step: Run Docker container locally**
-      - name: Run Docker container locally
-        run: |
-          # Stop existing container if running
-          docker rm -f hello-maven || true
-          # Run container mapping port 9090
-          docker run -d --name hello-maven -p 9090:9090 ${{ secrets.DOCKER_USERNAME }}/hello-maven:latest
-
-      # Push Docker image to Docker Hub (post-build)
+      # Push Docker image to Docker Hub
       - name: Push Docker image
         run: |
           docker push ${{ secrets.DOCKER_USERNAME }}/hello-maven:latest
