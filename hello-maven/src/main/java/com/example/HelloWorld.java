@@ -1,12 +1,16 @@
 package com.example;
 
-import static spark.Spark.*;
+import java.util.Scanner;
 
-public class App {
+public class HelloWorld {
     public static void main(String[] args) {
-        port(8080);
-        ipAddress("0.0.0.0");
-        get("/", (req, res) -> "Hello, i am yogesh");
-        System.out.println("Server started at http://0.0.0.0:8080");
+        Scanner scanner = new Scanner(System.in);
+
+        System.out.print("Enter your name: ");
+        String name = scanner.nextLine();
+
+        System.out.println("Hello hi, " + name + "! Welcome to Java.");
+
+        scanner.close();
     }
 }
