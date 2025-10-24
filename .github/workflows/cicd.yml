@@ -12,7 +12,7 @@ permissions:
   contents: write
 
 jobs:
-  build:
+  build-and-deploy:
 
     runs-on: ubuntu-latest
 
@@ -32,14 +32,14 @@ jobs:
       - name: Build with Maven
         run: mvn -B package --file pom.xml
 
-      # Optional: upload the JAR as an artifact for later download
+      # Upload the JAR artifact (optional)
       - name: Upload JAR Artifact
         uses: actions/upload-artifact@v4
         with:
           name: hello-maven-jar
           path: target/hello-maven-1.0-SNAPSHOT.jar
 
-      # Optional: update dependency graph for Dependabot
+      # Update dependency graph (optional)
       - name: Update dependency graph
         uses: advanced-security/maven-dependency-submission-action@571e99aab1055c2e71a1e2309b9691de18d6b7d6
 
@@ -50,7 +50,7 @@ jobs:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
-      # Build Docker image using the JAR in target/
+      # Build Docker image
       - name: Build Docker image
         run: |
           docker build -t ${{ secrets.DOCKER_USERNAME }}/hello-maven:latest .
@@ -59,3 +59,21 @@ jobs:
       - name: Push Docker image
         run: |
           docker push ${{ secrets.DOCKER_USERNAME }}/hello-maven:latest
+
+      # Deploy Docker image on EC2
+      - name: Deploy to EC2
+        uses: appleboy/ssh-action@v0.1.7
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ec2-user
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
+            # Pull the latest Docker image
+            docker pull ${{ secrets.DOCKER_USERNAME }}/hello-maven:latest
+
+            # Stop and remove existing container if exists
+            docker stop hello-maven || true
+            docker rm hello-maven || true
+
+            # Run the new container
+            docker run -d --name hello-maven -p 8080:8080 ${{ secrets.DOCKER_USERNAME }}/hello-maven:latest
