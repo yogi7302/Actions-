@@ -9,7 +9,7 @@ public class HelloWorld {
         System.out.print("Enter your name: ");
         String name = scanner.nextLine();
 
-        System.out.println("Hello hi, " + name + "! Welcome to Java.");
+        System.out.println("Hello hi vanakam, " + name + "! Welcome to Java.");
 
         scanner.close();
     }
