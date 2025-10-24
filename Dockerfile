@@ -1,15 +1,5 @@
-# Use OpenJDK 17 slim base image
 FROM openjdk:17-jdk-slim
-
-# Set working directory
+COPY target/hello-maven-1.0-SNAPSHOT.jar /app/hello-maven.jar
 WORKDIR /app
-
-# Accept the JAR file path as a build argument
-ARG JAR_FILE
-COPY ${JAR_FILE} hello-maven.jar
-
-# Expose application port
 EXPOSE 9090
-
-# Run the application
-ENTRYPOINT ["java", "-jar", "hello-maven.jar"]
+ENTRYPOINT ["java","-jar","hello-maven.jar"]
