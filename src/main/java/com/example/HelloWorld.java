@@ -11,8 +11,8 @@ public class HelloWorld {
         get("/", (req, res) -> {
             // Read "name" query parameter, default to "World" if not provided
             String name = req.queryParams("name");
-            if (name == null || name.isEmpty()) name = "YOGESHPANDIAN";
-            return "Hello, " + name + "! Welcome to Java.";
+            if (name == null || name.isEmpty()) name = "YOGi";
+            return "Hello, " + name + "! Welcome to Java. THANKYOU";
         });
     }
 }
