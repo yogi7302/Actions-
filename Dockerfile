@@ -1,5 +1,16 @@
+# Use OpenJDK 17 slim base image
 FROM openjdk:17-jdk-slim
-COPY target/hello-maven-1.0-SNAPSHOT.jar /app/hello-maven.jar
+
+# Set working directory
 WORKDIR /app
+
+# Copy the shaded JAR produced by Maven into the container
+# Use build argument JAR_FILE so GitHub Actions can specify the JAR dynamically
+ARG JAR_FILE=target/*-shaded.jar
+COPY ${JAR_FILE} hello-maven.jar
+
+# Expose application port
 EXPOSE 9090
-ENTRYPOINT ["java","-jar","hello-maven.jar"]
+
+# Run the application
+ENTRYPOINT ["java", "-jar", "hello-maven.jar"]
