@@ -1,16 +1,18 @@
 package com.example;
 
-import java.util.Scanner;
+import static spark.Spark.*;
 
 public class HelloWorld {
     public static void main(String[] args) {
-        Scanner scanner = new Scanner(System.in);
+        // Set the port your app will listen on inside Docker
+        port(8080);
 
-        System.out.print("Enter your name: ");
-        String name = scanner.nextLine();
-
-        System.out.println("Hello hi vanakam, " + name + "! Welcome to Java.");
-
-        scanner.close();
+        // Define the root endpoint "/"
+        get("/", (req, res) -> {
+            // Read "name" query parameter, default to "World" if not provided
+            String name = req.queryParams("name");
+            if (name == null || name.isEmpty()) name = "World";
+            return "Hello hi vanakam, " + name + "! Welcome to Java.";
+        });
     }
 }
