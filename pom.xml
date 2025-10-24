@@ -61,7 +61,7 @@
                 </configuration>
             </plugin>
 
-            <!-- Shade plugin to create a fat JAR with dependencies -->
+            <!-- Shade plugin to create fat JAR -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-shade-plugin</artifactId>
@@ -73,6 +73,7 @@
                             <goal>shade</goal>
                         </goals>
                         <configuration>
+                            <finalName>hello-maven-shaded</finalName>
                             <transformers>
                                 <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
                                     <mainClass>com.example.HelloWorld</mainClass>
