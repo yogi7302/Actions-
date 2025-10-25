@@ -4,12 +4,12 @@ on:
   push:
     branches: 
       - "main"
-  pull_request:
-    branches: 
-      - "main"
+  #pull_request:
+    #branches: 
+      #- "main"
 
-permissions:
-  contents: write
+#permissions:
+  #contents: write
 
 jobs:
   build-and-deploy:
@@ -72,7 +72,7 @@ jobs:
             docker pull ${{ secrets.DOCKER_USERNAME }}/hello-maven:latest
 
             # Stop and remove existing container if exists
-            docker stop hello-maven || true
+            # docker stop hello-maven || true
             docker rm hello-maven || true
 
             # Run the new container
