@@ -33,6 +33,7 @@ resource "aws_internet_gateway" "gw" {
 # Route Table + association
 resource "aws_route_table" "public" {
   vpc_id = aws_vpc.main.id
+
   route {
     cidr_block = "0.0.0.0/0"
     gateway_id = aws_internet_gateway.gw.id
@@ -57,6 +58,7 @@ resource "aws_security_group" "ec2_sg" {
     to_port     = 22
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
+    description = "SSH access"
   }
 
   ingress {
@@ -64,6 +66,7 @@ resource "aws_security_group" "ec2_sg" {
     to_port     = 8080
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
+    description = "App port 8080"
   }
 
   egress {
@@ -71,6 +74,7 @@ resource "aws_security_group" "ec2_sg" {
     to_port     = 0
     protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
+    description = "Allow all outbound"
   }
 
   tags = {
@@ -78,14 +82,14 @@ resource "aws_security_group" "ec2_sg" {
   }
 }
 
-# EC2 Instance
+# EC2 Instance (fixed)
 resource "aws_instance" "app_server" {
-  ami                         = "ami-0c02fb55956c7d316" # Amazon Linux 2
+  ami                         = "ami-04f76ebf53292ef4c" # ✅ Correct AMI for eu-north-1
   instance_type               = "t2.micro"
   subnet_id                   = aws_subnet.public.id
   vpc_security_group_ids      = [aws_security_group.ec2_sg.id]
   associate_public_ip_address = true
-  key_name                    = "your-keypair" # Optional: must exist in AWS if SSH access needed
+  key_name                    = "your-keypair" # Must exist in your AWS account if you want SSH access
 
   user_data = <<-EOF
               #!/bin/bash
@@ -103,6 +107,7 @@ resource "aws_instance" "app_server" {
   }
 }
 
+# Output
 output "instance_public_ip" {
   description = "Public IP of the EC2 instance"
   value       = aws_instance.app_server.public_ip
