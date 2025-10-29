@@ -12,7 +12,8 @@ public class HelloWorld {
             // Read "name" query parameter, default to "World" if not provided
             String name = req.queryParams("name");
             if (name == null || name.isEmpty()) name = "RAGE INDRA";
-            return "Hello, " + name + "ITS TIME FOR BGMI";
+            return "Hello, " + name + "ITS TIME FOR BGMI...";
         });
     }
 }
+
