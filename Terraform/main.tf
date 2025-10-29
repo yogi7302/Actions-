@@ -58,7 +58,7 @@ resource "aws_security_group" "ec2_sg" {
     to_port     = 22
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
-    description = "SSH access"
+    description = "SSH access (not used but open)"
   }
 
   ingress {
@@ -82,14 +82,13 @@ resource "aws_security_group" "ec2_sg" {
   }
 }
 
-# ✅ EC2 Instance (updated AMI)
+# ✅ EC2 Instance (no key pair)
 resource "aws_instance" "app_server" {
   ami                         = "ami-064703c4bf3f2e142" # ✅ Latest Amazon Linux 2 for eu-north-1
   instance_type               = "t2.micro"
   subnet_id                   = aws_subnet.public.id
   vpc_security_group_ids      = [aws_security_group.ec2_sg.id]
   associate_public_ip_address = true
-  key_name                    = "your-keypair" # Must exist in eu-north-1
 
   user_data = <<-EOF
               #!/bin/bash
