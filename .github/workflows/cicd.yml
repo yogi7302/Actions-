@@ -1,26 +1,22 @@
-name: Java CI with Maven and Docker
+name: CI/CD with Maven, Docker, and Terraform
 
-#on:
+on:
   push:
-    branches: 
+    branches:
       - "main"
-  #pull_request:
-    #branches: 
-      #- "main"
 
 permissions:
   contents: write
 
 jobs:
-  build-and-deploy:
-
+  build-and-provision:
     runs-on: ubuntu-latest
 
     steps:
-      # Checkout the repository
+      # 1️⃣ Checkout repository
       - uses: actions/checkout@v4
 
-      # Set up JDK 17
+      # 2️⃣ Set up JDK
       - name: Set up JDK 17
         uses: actions/setup-java@v4
         with:
@@ -28,52 +24,55 @@ jobs:
           distribution: 'temurin'
           cache: maven
 
-      # Build the project with Maven
+      # 3️⃣ Build with Maven
       - name: Build with Maven
         run: mvn -B package --file pom.xml
 
-      # Upload the JAR artifact (optional)
-      - name: Upload JAR Artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: hello-maven-jar
-          path: target/hello-maven-1.0-SNAPSHOT.jar
-
-      # Update dependency graph (optional)
-      - name: Update dependency graph
-        uses: advanced-security/maven-dependency-submission-action@571e99aab1055c2e71a1e2309b9691de18d6b7d6
-
-      # Log in to Docker Hub
+      # 4️⃣ Log in to Docker Hub
       - name: Log in to Docker Hub
         uses: docker/login-action@v2
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
-      # Build Docker image
-      - name: Build Docker image
+      # 5️⃣ Build & Push Docker image
+      - name: Build and Push Docker image
         run: |
           docker build -t ${{ secrets.DOCKER_USERNAME }}/hello-maven:latest .
-
-      # Push Docker image to Docker Hub
-      - name: Push Docker image
-        run: |
           docker push ${{ secrets.DOCKER_USERNAME }}/hello-maven:latest
 
-      # Deploy Docker image on EC2
-      - name: Deploy to EC2
-        uses: appleboy/ssh-action@v0.1.7
+      # 6️⃣ Configure AWS credentials
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
         with:
-          host: ${{ secrets.EC2_HOST }}
-          username: ec2-user
-          key: ${{ secrets.EC2_SSH_KEY }}
-          script: |
-            # Pull the latest Docker image
-            docker pull ${{ secrets.DOCKER_USERNAME }}/hello-maven:latest
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
 
-            # Stop and remove existing container if exists
-            # docker stop hello-maven || true
-            docker rm hello-maven || true
+      # 7️⃣ Set up Terraform
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.9.7
 
-            # Run the new container
-            docker run -d --name hello-maven -p 8080:8080 ${{ secrets.DOCKER_USERNAME }}/hello-maven:latest
+      # 8️⃣ Initialize Terraform
+      - name: Terraform Init
+        run: terraform init
+
+      # 9️⃣ Validate Terraform
+      - name: Terraform Validate
+        run: terraform validate
+
+      # 🔟 Plan Terraform
+      - name: Terraform Plan
+        run: terraform plan -out=tfplan
+        env:
+          TF_VAR_docker_username: ${{ secrets.DOCKER_USERNAME }}
+          TF_VAR_docker_password: ${{ secrets.DOCKER_PASSWORD }}
+
+      # 1️⃣1️⃣ Apply Terraform (provision infra)
+      - name: Terraform Apply
+        run: terraform apply -auto-approve tfplan
+        env:
+          TF_VAR_docker_username: ${{ secrets.DOCKER_USERNAME }}
+          TF_VAR_docker_password: ${{ secrets.DOCKER_PASSWORD }}
