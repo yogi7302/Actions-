@@ -57,14 +57,17 @@ jobs:
 
       # 8️⃣ Initialize Terraform
       - name: Terraform Init
+        working-directory: Terraform
         run: terraform init
 
       # 9️⃣ Validate Terraform
       - name: Terraform Validate
+        working-directory: Terraform
         run: terraform validate
 
       # 🔟 Plan Terraform
       - name: Terraform Plan
+        working-directory: Terraform
         run: terraform plan -out=tfplan
         env:
           TF_VAR_docker_username: ${{ secrets.DOCKER_USERNAME }}
@@ -72,7 +75,13 @@ jobs:
 
       # 1️⃣1️⃣ Apply Terraform (provision infra)
       - name: Terraform Apply
+        working-directory: Terraform
         run: terraform apply -auto-approve tfplan
         env:
           TF_VAR_docker_username: ${{ secrets.DOCKER_USERNAME }}
           TF_VAR_docker_password: ${{ secrets.DOCKER_PASSWORD }}
+
+      # 1️⃣2️⃣ Show App URL
+      - name: Show Application URL
+        working-directory: Terraform
+        run: terraform output app_url
